@@ -1,0 +1,186 @@
+import SwiftUI
+
+struct OnboardingView: View {
+    @State private var currentStep = 0
+    @State private var currentSupplements = ""
+    @State private var height = ""
+    @State private var weight = ""
+    @State private var gender = "Male"
+    @State private var selectedGoals: Set<String> = []
+    
+    let goals = [
+        "Build Muscle",
+        "Happier Lifestyle",
+        "Cognitive Clarity",
+        "Performance",
+        "Better Sleep",
+        "More Focus"
+    ]
+    
+    var body: some View {
+        ZStack {
+            Color.black.ignoresSafeArea()
+            
+            VStack(spacing: 30) {
+                switch currentStep {
+                case 0:
+                    supplementsStep
+                case 1:
+                    heightWeightStep
+                case 2:
+                    goalsStep
+                case 3:
+                    authStep
+                default:
+                    EmptyView()
+                }
+            }
+            .padding()
+        }
+    }
+    
+    private var supplementsStep: some View {
+        VStack(spacing: 20) {
+            Text("What supplements are you currently using?")
+                .font(.title2)
+                .foregroundColor(.white)
+                .multilineTextAlignment(.center)
+            
+            TextEditor(text: $currentSupplements)
+                .frame(height: 100)
+                .padding()
+                .background(Color.white.opacity(0.1))
+                .cornerRadius(10)
+                .foregroundColor(.white)
+            
+            Button(action: { currentStep += 1 }) {
+                Text("Next")
+                    .foregroundColor(.black)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(10)
+            }
+        }
+    }
+    
+    private var heightWeightStep: some View {
+        VStack(spacing: 20) {
+            Text("Tell us about yourself")
+                .font(.title2)
+                .foregroundColor(.white)
+                .multilineTextAlignment(.center)
+            
+            TextField("Height", text: $height)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .foregroundColor(.black)
+            
+            TextField("Weight", text: $weight)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .foregroundColor(.black)
+            
+            Picker("Gender", selection: $gender) {
+                Text("Male").tag("Male")
+                Text("Female").tag("Female")
+            }
+            .pickerStyle(SegmentedPickerStyle())
+            
+            Button(action: { currentStep += 1 }) {
+                Text("Next")
+                    .foregroundColor(.black)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(10)
+            }
+        }
+    }
+    
+    private var goalsStep: some View {
+        VStack(spacing: 20) {
+            Text("What are your goals?")
+                .font(.title2)
+                .foregroundColor(.white)
+                .multilineTextAlignment(.center)
+            
+            ScrollView {
+                VStack(alignment: .leading, spacing: 15) {
+                    ForEach(goals, id: \.self) { goal in
+                        Button(action: {
+                            if selectedGoals.contains(goal) {
+                                selectedGoals.remove(goal)
+                            } else {
+                                selectedGoals.insert(goal)
+                            }
+                        }) {
+                            HStack {
+                                Image(systemName: selectedGoals.contains(goal) ? "checkmark.square.fill" : "square")
+                                Text(goal)
+                                Spacer()
+                            }
+                            .foregroundColor(.white)
+                        }
+                    }
+                }
+            }
+            
+            Button(action: { currentStep += 1 }) {
+                Text("Next")
+                    .foregroundColor(.black)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(10)
+            }
+        }
+    }
+    
+    private var authStep: some View {
+        VStack(spacing: 20) {
+            Text("Create an account to save your preferences")
+                .font(.title2)
+                .foregroundColor(.white)
+                .multilineTextAlignment(.center)
+            
+            Button(action: {
+                // Handle Google Sign In
+            }) {
+                HStack {
+                    Image(systemName: "g.circle.fill")
+                    Text("Continue with Google")
+                }
+                .foregroundColor(.black)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.white)
+                .cornerRadius(10)
+            }
+            
+            Button(action: {
+                // Handle Email Sign In
+            }) {
+                Text("Sign in with Email")
+                    .foregroundColor(.black)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(10)
+            }
+            
+            Button(action: {
+                // Handle Create Account
+            }) {
+                Text("Create Account")
+                    .foregroundColor(.black)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(10)
+            }
+        }
+    }
+}
+
+#Preview {
+    OnboardingView()
+} 
