@@ -1,47 +1,85 @@
 import SwiftUI
 
 struct HomeView: View {
-    @EnvironmentObject private var viewModel: SupplyViewModel
+    @EnvironmentObject var viewModel: SupplyViewModel
     
     var body: some View {
         NavigationView {
-            List {
-                Section(header: Text("Today's Supplements")) {
-                    if viewModel.currentUser.supplements.isEmpty {
-                        Text("No supplements added yet")
-                            .foregroundColor(.secondary)
-                    } else {
-                        ForEach(viewModel.currentUser.supplements) { supplement in
-                            SupplementRow(supplement: supplement)
-                        }
-                    }
-                }
+            ZStack {
+                Color.black.ignoresSafeArea()
                 
-                Section(header: Text("Quick Actions")) {
-                    Button(action: {
-                        // TODO: Implement add supplement action
-                    }) {
-                        Label("Add Supplement", systemImage: "plus.circle.fill")
+                ScrollView {
+                    VStack(spacing: 20) {
+                        todayProgress
+                        currentSupplements
                     }
+                    .padding()
                 }
             }
-            .navigationTitle("Supply")
+            .navigationTitle("Today")
+            .navigationBarTitleDisplayMode(.large)
+            .foregroundColor(.white)
         }
     }
-}
-
-struct SupplementRow: View {
-    @EnvironmentObject private var viewModel: SupplyViewModel
-    let supplement: Supplement
     
-    var body: some View {
+    private var todayProgress: some View {
+        VStack(alignment: .leading, spacing: 15) {
+            Text("Today's Progress")
+                .font(.title2)
+                .foregroundColor(.white)
+            
+            let takenCount = viewModel.currentUser.supplements.filter { $0.isTaken }.count
+            let totalCount = viewModel.currentUser.supplements.count
+            
+            HStack {
+                Text("\(takenCount)/\(totalCount)")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                
+                Spacer()
+                
+                Text("\(Int((Double(takenCount) / Double(totalCount)) * 100))%")
+                    .font(.headline)
+                    .foregroundColor(.white)
+            }
+            
+            ProgressView(value: Double(takenCount), total: Double(totalCount))
+                .tint(.white)
+        }
+        .padding()
+        .background(Color.white.opacity(0.1))
+        .cornerRadius(10)
+    }
+    
+    private var currentSupplements: some View {
+        VStack(alignment: .leading, spacing: 15) {
+            Text("Today's Supplements")
+                .font(.title2)
+                .foregroundColor(.white)
+            
+            if viewModel.currentUser.supplements.isEmpty {
+                Text("No supplements added yet")
+                    .foregroundColor(.gray)
+                    .padding()
+            } else {
+                ForEach(viewModel.currentUser.supplements) { supplement in
+                    supplementRow(supplement)
+                }
+            }
+        }
+        .padding()
+        .background(Color.white.opacity(0.1))
+        .cornerRadius(10)
+    }
+    
+    private func supplementRow(_ supplement: Supplement) -> some View {
         HStack {
             VStack(alignment: .leading) {
                 Text(supplement.name)
                     .font(.headline)
-                Text(supplement.dosage)
+                Text("\(supplement.dosage) - \(supplement.frequency)")
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.gray)
             }
             
             Spacer()
@@ -50,10 +88,11 @@ struct SupplementRow: View {
                 viewModel.toggleSupplementTaken(supplement)
             }) {
                 Image(systemName: supplement.isTaken ? "checkmark.circle.fill" : "circle")
-                    .foregroundColor(supplement.isTaken ? .green : .gray)
+                    .foregroundColor(supplement.isTaken ? .green : .white)
+                    .font(.title2)
             }
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 8)
     }
 }
 

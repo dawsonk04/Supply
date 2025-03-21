@@ -1,23 +1,37 @@
 import SwiftUI
 
 struct OnboardingView: View {
+    @StateObject private var viewModel = SupplyViewModel()
+    @ObservedObject var appStateManager: AppStateManager
     @State private var currentStep = 0
     @State private var currentSupplements = ""
     @State private var height = ""
     @State private var weight = ""
     @State private var gender = "Male"
-    @State private var selectedGoals: Set<String> = []
-    
-    let goals = [
-        "Build Muscle",
-        "Happier Lifestyle",
-        "Cognitive Clarity",
-        "Performance",
-        "Better Sleep",
-        "More Focus"
-    ]
+    @State private var selectedGoals: Set<FitnessGoal> = []
+    @State private var isAuthenticated = false
     
     var body: some View {
+        if isAuthenticated {
+            MainTabView()
+                .environmentObject(viewModel)
+                .onAppear {
+                    // Save user data to ViewModel
+                    viewModel.updateUserProfile(
+                        supplements: currentSupplements,
+                        height: height,
+                        weight: weight,
+                        gender: gender,
+                        goals: selectedGoals
+                    )
+                    appStateManager.completeOnboarding()
+                }
+        } else {
+            onboardingContent
+        }
+    }
+    
+    private var onboardingContent: some View {
         ZStack {
             Color.black.ignoresSafeArea()
             
@@ -105,7 +119,7 @@ struct OnboardingView: View {
             
             ScrollView {
                 VStack(alignment: .leading, spacing: 15) {
-                    ForEach(goals, id: \.self) { goal in
+                    ForEach(FitnessGoal.allCases, id: \.self) { goal in
                         Button(action: {
                             if selectedGoals.contains(goal) {
                                 selectedGoals.remove(goal)
@@ -115,7 +129,7 @@ struct OnboardingView: View {
                         }) {
                             HStack {
                                 Image(systemName: selectedGoals.contains(goal) ? "checkmark.square.fill" : "square")
-                                Text(goal)
+                                Text(goal.rawValue)
                                 Spacer()
                             }
                             .foregroundColor(.white)
@@ -132,6 +146,7 @@ struct OnboardingView: View {
                     .background(Color.white)
                     .cornerRadius(10)
             }
+            .disabled(selectedGoals.isEmpty)
         }
     }
     
@@ -144,6 +159,7 @@ struct OnboardingView: View {
             
             Button(action: {
                 // Handle Google Sign In
+                simulateAuthentication()
             }) {
                 HStack {
                     Image(systemName: "g.circle.fill")
@@ -158,6 +174,7 @@ struct OnboardingView: View {
             
             Button(action: {
                 // Handle Email Sign In
+                simulateAuthentication()
             }) {
                 Text("Sign in with Email")
                     .foregroundColor(.black)
@@ -169,6 +186,7 @@ struct OnboardingView: View {
             
             Button(action: {
                 // Handle Create Account
+                simulateAuthentication()
             }) {
                 Text("Create Account")
                     .foregroundColor(.black)
@@ -179,8 +197,12 @@ struct OnboardingView: View {
             }
         }
     }
+    
+    private func simulateAuthentication() {
+        isAuthenticated = true
+    }
 }
 
 #Preview {
-    OnboardingView()
+    OnboardingView(appStateManager: AppStateManager())
 } 

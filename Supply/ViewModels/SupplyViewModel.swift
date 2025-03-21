@@ -7,18 +7,37 @@ class SupplyViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String?
     
+    // User profile data
+    @Published var userSupplements: String = ""
+    @Published var userHeight: String = ""
+    @Published var userWeight: String = ""
+    @Published var userGender: String = ""
+    @Published var userGoals: Set<FitnessGoal> = []
+    
     init() {
-        // Initialize with a default user
         self.currentUser = User()
+        loadFromUserDefaults()
         loadRecommendedSupplements()
     }
     
-    func updateUserProfile(age: Int, weight: Double, height: Double, goals: [FitnessGoal], preferences: [DietaryPreference]) {
-        currentUser.age = age
-        currentUser.weight = weight
-        currentUser.height = height
-        currentUser.fitnessGoals = goals
-        currentUser.dietaryPreferences = preferences
+    func updateUserProfile(supplements: String, height: String, weight: String, gender: String, goals: Set<FitnessGoal>) {
+        userSupplements = supplements
+        userHeight = height
+        userWeight = weight
+        userGender = gender
+        userGoals = goals
+        
+        // Update current user
+        if let weightDouble = Double(weight) {
+            currentUser.weight = weightDouble
+        }
+        if let heightDouble = Double(height) {
+            currentUser.height = heightDouble
+        }
+        
+        currentUser.fitnessGoals = Array(goals)
+        
+        saveToUserDefaults()
         loadRecommendedSupplements()
     }
     
@@ -32,10 +51,9 @@ class SupplyViewModel: ObservableObject {
         currentUser.supplements.append(supplement)
     }
     
-    func loadRecommendedSupplements() {
+    private func loadRecommendedSupplements() {
         isLoading = true
-        // TODO: Implement AI recommendation logic
-        // For now, we'll use sample data
+        // Simulate API call with sample data
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             self.recommendedSupplements = [
                 Supplement(
@@ -56,6 +74,31 @@ class SupplyViewModel: ObservableObject {
                 )
             ]
             self.isLoading = false
+        }
+    }
+    
+    private func saveToUserDefaults() {
+        let userData: [String: Any] = [
+            "supplements": userSupplements,
+            "height": userHeight,
+            "weight": userWeight,
+            "gender": userGender,
+            "goals": userGoals.map { $0.rawValue }
+        ]
+        UserDefaults.standard.set(userData, forKey: "userData")
+    }
+    
+    private func loadFromUserDefaults() {
+        guard let userData = UserDefaults.standard.dictionary(forKey: "userData") else { return }
+        
+        userSupplements = userData["supplements"] as? String ?? ""
+        userHeight = userData["height"] as? String ?? ""
+        userWeight = userData["weight"] as? String ?? ""
+        userGender = userData["gender"] as? String ?? ""
+        if let goalStrings = userData["goals"] as? [String] {
+            userGoals = Set(goalStrings.compactMap { rawValue in
+                FitnessGoal.allCases.first { $0.rawValue == rawValue }
+            })
         }
     }
 } 
