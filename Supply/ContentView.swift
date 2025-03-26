@@ -9,17 +9,20 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
-    @StateObject private var appStateManager = AppStateManager()
+    @EnvironmentObject var viewModel: SupplyViewModel
     
     var body: some View {
-        if appStateManager.hasCompletedOnboarding {
-            MainTabView()
-        } else {
-            OnboardingView(appStateManager: appStateManager)
+        NavigationView {
+            if viewModel.currentUser.name.isEmpty {
+                OnboardingView()
+            } else {
+                MainTabView()
+            }
         }
     }
 }
 
 #Preview {
     ContentView()
+        .environmentObject(SupplyViewModel())
 }

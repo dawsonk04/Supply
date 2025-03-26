@@ -15,40 +15,51 @@ class SupplyViewModel: ObservableObject {
     @Published var userGoals: Set<FitnessGoal> = []
     
     init() {
-        self.currentUser = User()
+        // Initialize with default user
+        self.currentUser = User(
+            name: "",
+            age: 0,
+            height: nil,
+            weight: nil,
+            fitnessGoals: [],
+            dietaryPreferences: [],
+            supplements: []
+        )
         loadFromUserDefaults()
         loadRecommendedSupplements()
     }
     
-    func updateUserProfile(supplements: String, height: String, weight: String, gender: String, goals: Set<FitnessGoal>) {
-        userSupplements = supplements
-        userHeight = height
-        userWeight = weight
-        userGender = gender
-        userGoals = goals
-        
-        // Update current user
-        if let weightDouble = Double(weight) {
-            currentUser.weight = weightDouble
-        }
-        if let heightDouble = Double(height) {
-            currentUser.height = heightDouble
-        }
-        
-        currentUser.fitnessGoals = Array(goals)
-        
+    func completeOnboarding(name: String, age: Int, goals: [FitnessGoal], preferences: [DietaryPreference]) {
+        currentUser.name = name
+        currentUser.age = age
+        currentUser.fitnessGoals = goals
+        currentUser.dietaryPreferences = preferences
         saveToUserDefaults()
-        loadRecommendedSupplements()
+    }
+    
+    func updateUserProfile(name: String, age: Int, goals: [FitnessGoal], preferences: [DietaryPreference]) {
+        currentUser.name = name
+        currentUser.age = age
+        currentUser.fitnessGoals = goals
+        currentUser.dietaryPreferences = preferences
+        saveToUserDefaults()
     }
     
     func toggleSupplementTaken(_ supplement: Supplement) {
         if let index = currentUser.supplements.firstIndex(where: { $0.id == supplement.id }) {
             currentUser.supplements[index].isTaken.toggle()
+            saveToUserDefaults()
         }
     }
     
     func addSupplement(_ supplement: Supplement) {
         currentUser.supplements.append(supplement)
+        saveToUserDefaults()
+    }
+    
+    func removeSupplement(_ supplement: Supplement) {
+        currentUser.supplements.removeAll { $0.id == supplement.id }
+        saveToUserDefaults()
     }
     
     private func loadRecommendedSupplements() {
@@ -78,27 +89,15 @@ class SupplyViewModel: ObservableObject {
     }
     
     private func saveToUserDefaults() {
-        let userData: [String: Any] = [
-            "supplements": userSupplements,
-            "height": userHeight,
-            "weight": userWeight,
-            "gender": userGender,
-            "goals": userGoals.map { $0.rawValue }
-        ]
-        UserDefaults.standard.set(userData, forKey: "userData")
+        if let encoded = try? JSONEncoder().encode(currentUser) {
+            UserDefaults.standard.set(encoded, forKey: "userData")
+        }
     }
     
     private func loadFromUserDefaults() {
-        guard let userData = UserDefaults.standard.dictionary(forKey: "userData") else { return }
-        
-        userSupplements = userData["supplements"] as? String ?? ""
-        userHeight = userData["height"] as? String ?? ""
-        userWeight = userData["weight"] as? String ?? ""
-        userGender = userData["gender"] as? String ?? ""
-        if let goalStrings = userData["goals"] as? [String] {
-            userGoals = Set(goalStrings.compactMap { rawValue in
-                FitnessGoal.allCases.first { $0.rawValue == rawValue }
-            })
+        if let userData = UserDefaults.standard.data(forKey: "userData"),
+           let decodedUser = try? JSONDecoder().decode(User.self, from: userData) {
+            self.currentUser = decodedUser
         }
     }
 } 

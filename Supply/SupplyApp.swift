@@ -9,15 +9,12 @@ import SwiftUI
 
 @main
 struct SupplyApp: App {
-    @StateObject private var appStateManager = AppStateManager()
+    @StateObject private var viewModel = SupplyViewModel()
     
     var body: some Scene {
         WindowGroup {
-            if appStateManager.hasCompletedOnboarding {
-                MainTabView()
-            } else {
-                OnboardingView(appStateManager: appStateManager)
-            }
+            ContentView()
+                .environmentObject(viewModel)
         }
     }
 }

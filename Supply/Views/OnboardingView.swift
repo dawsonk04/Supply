@@ -1,209 +1,244 @@
 import SwiftUI
 
 struct OnboardingView: View {
-    @StateObject private var viewModel = SupplyViewModel()
-    @ObservedObject var appStateManager: AppStateManager
+    @EnvironmentObject var viewModel: SupplyViewModel
     @State private var currentStep = 0
-    @State private var currentSupplements = ""
-    @State private var height = ""
-    @State private var weight = ""
-    @State private var gender = "Male"
+    @State private var name = ""
+    @State private var age = ""
     @State private var selectedGoals: Set<FitnessGoal> = []
-    @State private var isAuthenticated = false
+    @State private var selectedPreferences: Set<DietaryPreference> = []
     
     var body: some View {
-        if isAuthenticated {
-            MainTabView()
-                .environmentObject(viewModel)
-                .onAppear {
-                    // Save user data to ViewModel
-                    viewModel.updateUserProfile(
-                        supplements: currentSupplements,
-                        height: height,
-                        weight: weight,
-                        gender: gender,
-                        goals: selectedGoals
-                    )
-                    appStateManager.completeOnboarding()
-                }
-        } else {
-            onboardingContent
-        }
-    }
-    
-    private var onboardingContent: some View {
         ZStack {
-
             GradientBackground()
             
             VStack(spacing: 30) {
-                switch currentStep {
-                case 0:
-                    supplementsStep
-                case 1:
-                    heightWeightStep
-                case 2:
-                    goalsStep
-                case 3:
-                    authStep
-                default:
-                    EmptyView()
+                // Progress bar
+                ProgressView(value: Double(currentStep), total: 4)
+                    .tint(.black)
+                    .frame(height: 8)
+                    .background(Color.black.opacity(0.2))
+                    .cornerRadius(4)
+                    .padding(.horizontal)
+                
+                // Content
+                TabView(selection: $currentStep) {
+                    welcomeView
+                        .tag(0)
+                    
+                    nameAgeView
+                        .tag(1)
+                    
+                    goalsView
+                        .tag(2)
+                    
+                    preferencesView
+                        .tag(3)
+                    
+                    finalView
+                        .tag(4)
                 }
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                
+                // Navigation buttons
+                HStack(spacing: 20) {
+                    if currentStep > 0 {
+                        Button(action: {
+                            withAnimation {
+                                currentStep -= 1
+                            }
+                        }) {
+                            HStack {
+                                Image(systemName: "chevron.left")
+                                Text("Back")
+                            }
+                            .foregroundColor(.black)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.white.opacity(0.8))
+                            .cornerRadius(10)
+                        }
+                    }
+                    
+                    if currentStep < 4 {
+                        Button(action: {
+                            withAnimation {
+                                currentStep += 1
+                            }
+                        }) {
+                            Text(currentStep == 3 ? "Get Started" : "Next")
+                                .foregroundColor(.white)
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color.black)
+                                .cornerRadius(10)
+                        }
+                    }
+                }
+                .padding(.horizontal)
             }
+        }
+        .navigationBarBackButtonHidden(true)
+    }
+    
+    private var welcomeView: some View {
+        GlassCard {
+            VStack(spacing: 20) {
+                Image(systemName: "pills.fill")
+                    .font(.system(size: 60))
+                    .foregroundColor(.black)
+                
+                Text("Welcome to Supply")
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .foregroundColor(.black)
+                
+                Text("Your personal supplement tracking companion")
+                    .font(.title3)
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(.black.opacity(0.7))
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding()
         }
     }
     
-    private var supplementsStep: some View {
-        VStack(spacing: 20) {
-            Text("What supplements are you currently using?")
-                .font(.title2)
-                .foregroundColor(.white)
-                .multilineTextAlignment(.center)
-            
-            TextEditor(text: $currentSupplements)
-                .frame(height: 100)
-                .padding()
-                .background(Color.white.opacity(0.1))
-                .cornerRadius(10)
-                .foregroundColor(.white)
-            
-            Button(action: { currentStep += 1 }) {
-                Text("Next")
+    private var nameAgeView: some View {
+        GlassCard {
+            VStack(spacing: 20) {
+                Text("Tell us about yourself")
+                    .font(.title2)
+                    .fontWeight(.bold)
                     .foregroundColor(.black)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(10)
-            }
-        }
-    }
-    
-    private var heightWeightStep: some View {
-        VStack(spacing: 20) {
-            Text("Tell us about yourself")
-                .font(.title2)
-                .foregroundColor(.white)
-                .multilineTextAlignment(.center)
-            
-            TextField("Height", text: $height)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .foregroundColor(.black)
-            
-            TextField("Weight", text: $weight)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .foregroundColor(.black)
-            
-            Picker("Gender", selection: $gender) {
-                Text("Male").tag("Male")
-                Text("Female").tag("Female")
-            }
-            .pickerStyle(SegmentedPickerStyle())
-            
-            Button(action: { currentStep += 1 }) {
-                Text("Next")
-                    .foregroundColor(.black)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(10)
-            }
-        }
-    }
-    
-    private var goalsStep: some View {
-        VStack(spacing: 20) {
-            Text("What are your goals?")
-                .font(.title2)
-                .foregroundColor(.white)
-                .multilineTextAlignment(.center)
-            
-            ScrollView {
+                
                 VStack(alignment: .leading, spacing: 15) {
-                    ForEach(FitnessGoal.allCases, id: \.self) { goal in
-                        Button(action: {
-                            if selectedGoals.contains(goal) {
-                                selectedGoals.remove(goal)
-                            } else {
-                                selectedGoals.insert(goal)
-                            }
-                        }) {
-                            HStack {
-                                Image(systemName: selectedGoals.contains(goal) ? "checkmark.square.fill" : "square")
+                    TextField("Your name", text: $name)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .foregroundColor(.black)
+                    
+                    TextField("Your age", text: $age)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .keyboardType(.numberPad)
+                        .foregroundColor(.black)
+                }
+                .padding(.top)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding()
+        }
+    }
+    
+    private var goalsView: some View {
+        GlassCard {
+            VStack(spacing: 20) {
+                Text("What are your fitness goals?")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundColor(.black)
+                
+                ScrollView {
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 15) {
+                        ForEach(FitnessGoal.allCases, id: \.self) { goal in
+                            Button(action: {
+                                if selectedGoals.contains(goal) {
+                                    selectedGoals.remove(goal)
+                                } else {
+                                    selectedGoals.insert(goal)
+                                }
+                            }) {
                                 Text(goal.rawValue)
-                                Spacer()
+                                    .foregroundColor(selectedGoals.contains(goal) ? .white : .black)
+                                    .padding()
+                                    .frame(maxWidth: .infinity)
+                                    .background(selectedGoals.contains(goal) ? Color.black : Color.white.opacity(0.8))
+                                    .cornerRadius(10)
                             }
-                            .foregroundColor(.white)
                         }
                     }
+                    .padding(.top)
                 }
             }
-            
-            Button(action: { currentStep += 1 }) {
-                Text("Next")
-                    .foregroundColor(.black)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(10)
-            }
-            .disabled(selectedGoals.isEmpty)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding()
         }
     }
     
-    private var authStep: some View {
-        VStack(spacing: 20) {
-            Text("Create an account to save your preferences")
-                .font(.title2)
-                .foregroundColor(.white)
-                .multilineTextAlignment(.center)
-            
-            Button(action: {
-                // Handle Google Sign In
-                simulateAuthentication()
-            }) {
-                HStack {
-                    Image(systemName: "g.circle.fill")
-                    Text("Continue with Google")
+    private var preferencesView: some View {
+        GlassCard {
+            VStack(spacing: 20) {
+                Text("Any dietary preferences?")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundColor(.black)
+                
+                ScrollView {
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 15) {
+                        ForEach(DietaryPreference.allCases, id: \.self) { preference in
+                            Button(action: {
+                                if selectedPreferences.contains(preference) {
+                                    selectedPreferences.remove(preference)
+                                } else {
+                                    selectedPreferences.insert(preference)
+                                }
+                            }) {
+                                Text(preference.rawValue)
+                                    .foregroundColor(selectedPreferences.contains(preference) ? .white : .black)
+                                    .padding()
+                                    .frame(maxWidth: .infinity)
+                                    .background(selectedPreferences.contains(preference) ? Color.black : Color.white.opacity(0.8))
+                                    .cornerRadius(10)
+                            }
+                        }
+                    }
+                    .padding(.top)
                 }
-                .foregroundColor(.black)
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.white)
-                .cornerRadius(10)
             }
-            
-            Button(action: {
-                // Handle Email Sign In
-                simulateAuthentication()
-            }) {
-                Text("Sign in with Email")
-                    .foregroundColor(.black)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(10)
-            }
-            
-            Button(action: {
-                // Handle Create Account
-                simulateAuthentication()
-            }) {
-                Text("Create Account")
-                    .foregroundColor(.black)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(10)
-            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding()
         }
     }
     
-    private func simulateAuthentication() {
-        isAuthenticated = true
+    private var finalView: some View {
+        GlassCard {
+            VStack(spacing: 20) {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 60))
+                    .foregroundColor(.black)
+                
+                Text("You're all set!")
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .foregroundColor(.black)
+                
+                Text("Let's start tracking your supplements")
+                    .font(.title3)
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(.black.opacity(0.7))
+                
+                Button(action: {
+                    viewModel.completeOnboarding(
+                        name: name,
+                        age: Int(age) ?? 0,
+                        goals: Array(selectedGoals),
+                        preferences: Array(selectedPreferences)
+                    )
+                }) {
+                    Text("Get Started")
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.black)
+                        .cornerRadius(10)
+                }
+                .padding(.top)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding()
+        }
     }
 }
 
 #Preview {
-    OnboardingView(appStateManager: AppStateManager())
+    OnboardingView()
+        .environmentObject(SupplyViewModel())
 } 
