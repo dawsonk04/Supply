@@ -33,7 +33,8 @@ struct OnboardingView: View {
     
     private var onboardingContent: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
+
+            GradientBackground()
             
             VStack(spacing: 30) {
                 switch currentStep {

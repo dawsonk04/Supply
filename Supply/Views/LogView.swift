@@ -7,7 +7,7 @@ struct LogView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                Color.black.ignoresSafeArea()
+                GradientBackground()
                 
                 ScrollView {
                     VStack(spacing: 20) {
@@ -24,38 +24,37 @@ struct LogView: View {
     }
     
     private var datePicker: some View {
-        DatePicker(
-            "Select Date",
-            selection: $selectedDate,
-            displayedComponents: [.date]
-        )
-        .datePickerStyle(.graphical)
-        .padding()
-        .background(Color.white.opacity(0.1))
-        .cornerRadius(10)
+        GlassCard {
+            DatePicker(
+                "Select Date",
+                selection: $selectedDate,
+                displayedComponents: [.date]
+            )
+            .datePickerStyle(.graphical)
+            .accentColor(.white)
+        }
     }
     
     private var supplementLog: some View {
-        VStack(alignment: .leading, spacing: 15) {
-            Text("Supplements Taken")
-                .font(.title2)
-                .foregroundColor(.white)
-            
-            if viewModel.currentUser.supplements.isEmpty {
-                Text("No supplements logged for this date")
-                    .foregroundColor(.gray)
-                    .padding()
-            } else {
-                ForEach(viewModel.currentUser.supplements) { supplement in
-                    if supplement.isTaken {
-                        supplementLogRow(supplement)
+        GlassCard {
+            VStack(alignment: .leading, spacing: 15) {
+                Text("Supplements Taken")
+                    .font(.title2)
+                    .foregroundColor(.white)
+                
+                if viewModel.currentUser.supplements.isEmpty {
+                    Text("No supplements logged for this date")
+                        .foregroundColor(.gray)
+                        .padding()
+                } else {
+                    ForEach(viewModel.currentUser.supplements) { supplement in
+                        if supplement.isTaken {
+                            supplementLogRow(supplement)
+                        }
                     }
                 }
             }
         }
-        .padding()
-        .background(Color.white.opacity(0.1))
-        .cornerRadius(10)
     }
     
     private func supplementLogRow(_ supplement: Supplement) -> some View {
