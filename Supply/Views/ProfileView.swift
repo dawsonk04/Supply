@@ -25,11 +25,34 @@ struct ProfileView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(isEditing ? "Done" : "Edit") {
+                        if isEditing {
+                            // Save changes
+                            saveProfileChanges()
+                        }
                         isEditing.toggle()
                     }
                 }
             }
         }
+    }
+    
+    private func saveProfileChanges() {
+        // Convert weight from pounds to kg if present
+        var weightInKg: Double? = nil
+        if let weight = Double(viewModel.userWeight) {
+            // Convert pounds to kg (1 pound = 0.453592 kg)
+            weightInKg = weight * 0.453592
+        }
+        
+        viewModel.updateUserProfile(
+            name: viewModel.currentUser.name,
+            age: viewModel.currentUser.age,
+            height: viewModel.currentUser.height, // Keep existing height
+            weight: weightInKg,
+            gender: viewModel.userGender,
+            goals: viewModel.currentUser.fitnessGoals,
+            preferences: viewModel.currentUser.dietaryPreferences
+        )
     }
     
     private var profileHeader: some View {
@@ -40,9 +63,19 @@ struct ProfileView: View {
                 .frame(width: 100, height: 100)
                 .foregroundColor(.white)
             
-            Text(viewModel.userGender)
-                .font(.title2)
+            Text(viewModel.currentUser.name)
+                .font(.title)
                 .foregroundColor(.white)
+            
+            Text("Age: \(viewModel.currentUser.age)")
+                .font(.headline)
+                .foregroundColor(.white.opacity(0.8))
+            
+            if let gender = viewModel.userGender {
+                Text(gender.rawValue)
+                    .font(.subheadline)
+                    .foregroundColor(.white.opacity(0.8))
+            }
         }
         .padding()
         .frame(maxWidth: .infinity)
@@ -57,8 +90,19 @@ struct ProfileView: View {
                 .foregroundColor(.white)
             
             HStack(spacing: 20) {
-                statCard(title: "Height", value: viewModel.userHeight)
-                statCard(title: "Weight", value: viewModel.userWeight)
+                statCard(
+                    title: "Height", 
+                    value: (viewModel.currentUser.heightInFeet != nil && viewModel.currentUser.heightInInches != nil) ? 
+                        "\(viewModel.currentUser.heightInFeet!)'\(viewModel.currentUser.heightInInches!)\""  : 
+                        "Not set"
+                )
+                
+                statCard(
+                    title: "Weight", 
+                    value: viewModel.currentUser.weightInPounds != nil ? 
+                        "\(viewModel.currentUser.weightInPounds!) lbs" : 
+                        "Not set"
+                )
             }
         }
         .padding()
@@ -73,17 +117,18 @@ struct ProfileView: View {
                 .foregroundColor(.gray)
             
             if isEditing {
-                TextField(value, text: Binding(
-                    get: { value },
-                    set: { newValue in
-                        if title == "Height" {
-                            viewModel.userHeight = newValue
-                        } else {
-                            viewModel.userWeight = newValue
-                        }
-                    }
-                ))
-                .textFieldStyle(RoundedBorderTextFieldStyle())
+                if title == "Height" {
+                    Text("Edit in settings")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                } else if title == "Weight" {
+                    TextField("Weight (lbs)", text: Binding(
+                        get: { viewModel.userWeight },
+                        set: { viewModel.userWeight = $0 }
+                    ))
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .keyboardType(.numberPad)
+                }
             } else {
                 Text(value)
                     .font(.title3)

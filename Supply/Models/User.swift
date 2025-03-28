@@ -6,9 +6,30 @@ struct User: Codable, Identifiable {
     var age: Int
     var height: Double?
     var weight: Double?
+    var gender: Gender?
     var fitnessGoals: [FitnessGoal]
     var dietaryPreferences: [DietaryPreference]
     var supplements: [Supplement]
+    
+    // Helper computed properties
+    var heightInFeet: Int? {
+        guard let height = height else { return nil }
+        // Convert meters to feet (1 meter = 3.28084 feet)
+        return Int(height * 3.28084)
+    }
+    
+    var heightInInches: Int? {
+        guard let height = height else { return nil }
+        // Convert meters to total inches, then get remainder after feet
+        let totalInches = height * 39.3701
+        return Int(totalInches) % 12
+    }
+    
+    var weightInPounds: Int? {
+        guard let weight = weight else { return nil }
+        // Convert kg to pounds (1 kg = 2.20462 pounds)
+        return Int(weight * 2.20462)
+    }
 }
 
 enum FitnessGoal: String, Codable, CaseIterable {
@@ -31,4 +52,9 @@ enum DietaryPreference: String, Codable, CaseIterable {
     case glutenFree = "Gluten Free"
     case dairyFree = "Dairy Free"
     case none = "No Restrictions"
+}
+
+enum Gender: String, Codable, CaseIterable {
+    case male = "Male"
+    case female = "Female"
 } 

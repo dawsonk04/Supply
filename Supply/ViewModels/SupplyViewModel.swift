@@ -11,7 +11,7 @@ class SupplyViewModel: ObservableObject {
     @Published var userSupplements: String = ""
     @Published var userHeight: String = ""
     @Published var userWeight: String = ""
-    @Published var userGender: String = ""
+    @Published var userGender: Gender? = nil
     @Published var userGoals: Set<FitnessGoal> = []
     
     init() {
@@ -21,6 +21,7 @@ class SupplyViewModel: ObservableObject {
             age: 0,
             height: nil,
             weight: nil,
+            gender: nil,
             fitnessGoals: [],
             dietaryPreferences: [],
             supplements: []
@@ -29,17 +30,23 @@ class SupplyViewModel: ObservableObject {
         loadRecommendedSupplements()
     }
     
-    func completeOnboarding(name: String, age: Int, goals: [FitnessGoal], preferences: [DietaryPreference]) {
+    func completeOnboarding(name: String, age: Int, height: Double?, weight: Double?, gender: Gender?, goals: [FitnessGoal], preferences: [DietaryPreference]) {
         currentUser.name = name
         currentUser.age = age
+        currentUser.height = height
+        currentUser.weight = weight
+        currentUser.gender = gender
         currentUser.fitnessGoals = goals
         currentUser.dietaryPreferences = preferences
         saveToUserDefaults()
     }
     
-    func updateUserProfile(name: String, age: Int, goals: [FitnessGoal], preferences: [DietaryPreference]) {
+    func updateUserProfile(name: String, age: Int, height: Double?, weight: Double?, gender: Gender?, goals: [FitnessGoal], preferences: [DietaryPreference]) {
         currentUser.name = name
         currentUser.age = age
+        currentUser.height = height
+        currentUser.weight = weight
+        currentUser.gender = gender
         currentUser.fitnessGoals = goals
         currentUser.dietaryPreferences = preferences
         saveToUserDefaults()
