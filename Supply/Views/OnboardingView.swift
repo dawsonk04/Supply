@@ -20,15 +20,15 @@ struct OnboardingView: View {
     
     var body: some View {
         ZStack {
-            GradientBackground()
+            Color(hex: "F8F9FA").ignoresSafeArea()
             
             VStack(spacing: 30) {
                 // Progress bar
                 ProgressView(value: Double(currentStep), total: 5)
-                    .tint(.black)
-                    .frame(height: 8)
-                    .background(Color.black.opacity(0.2))
-                    .cornerRadius(4)
+                    .tint(Color(hex: "343A40"))
+                    .frame(height: 6)
+                    .background(Color(hex: "DEE2E6"))
+                    .cornerRadius(3)
                     .padding(.horizontal)
                 
                 // Content
@@ -65,10 +65,10 @@ struct OnboardingView: View {
                                 Image(systemName: "chevron.left")
                                 Text("Back")
                             }
-                            .foregroundColor(.black)
+                            .foregroundColor(Color(hex: "495057"))
                             .padding()
                             .frame(maxWidth: .infinity)
-                            .background(Color.white.opacity(0.8))
+                            .background(Color(hex: "E9ECEF"))
                             .cornerRadius(10)
                         }
                     }
@@ -83,7 +83,7 @@ struct OnboardingView: View {
                                 .foregroundColor(.white)
                                 .padding()
                                 .frame(maxWidth: .infinity)
-                                .background(Color.black)
+                                .background(Color(hex: "343A40"))
                                 .cornerRadius(10)
                         }
                     }
@@ -99,17 +99,17 @@ struct OnboardingView: View {
             VStack(spacing: 20) {
                 Image(systemName: "pills.fill")
                     .font(.system(size: 60))
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(hex: "343A40"))
                 
                 Text("Welcome to Supply")
                     .font(.title)
                     .fontWeight(.bold)
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(hex: "212529"))
                 
                 Text("Your personal supplement tracking companion")
                     .font(.title3)
                     .multilineTextAlignment(.center)
-                    .foregroundColor(.black.opacity(0.7))
+                    .foregroundColor(Color(hex: "6C757D"))
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding()
@@ -122,23 +122,23 @@ struct OnboardingView: View {
                 Text("Tell us about yourself")
                     .font(.title2)
                     .fontWeight(.bold)
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(hex: "212529"))
                 
                 VStack(alignment: .leading, spacing: 15) {
                     Text("Your name")
-                        .foregroundColor(.black.opacity(0.7))
+                        .foregroundColor(Color(hex: "6C757D"))
                     
                     TextField("Enter your name", text: $name)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .foregroundColor(.black)
+                        .foregroundColor(Color(hex: "212529"))
                     
                     Text("Your age")
-                        .foregroundColor(.black.opacity(0.7))
+                        .foregroundColor(Color(hex: "6C757D"))
                     
                     Picker("Age", selection: $selectedAge) {
                         ForEach(ageRange, id: \.self) { age in
                             Text("\(age)")
-                                .foregroundColor(.black)
+                                .foregroundColor(Color(hex: "212529"))
                         }
                     }
                     .pickerStyle(WheelPickerStyle())
@@ -157,23 +157,24 @@ struct OnboardingView: View {
                 Text("Your Physical Information")
                     .font(.title2)
                     .fontWeight(.bold)
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(hex: "212529"))
                 
                 VStack(alignment: .leading, spacing: 20) {
                     VStack(alignment: .leading) {
                         Text("Height")
                             .font(.headline)
-                            .foregroundColor(.black)
+                            .foregroundColor(Color(hex: "212529"))
                         
                         HStack {
                             VStack {
                                 Text("Feet")
                                     .font(.subheadline)
-                                    .foregroundColor(.black.opacity(0.7))
+                                    .foregroundColor(Color(hex: "6C757D"))
                                 
                                 Picker("Feet", selection: $selectedHeightFeet) {
                                     ForEach(feetRange, id: \.self) { feet in
                                         Text("\(feet) ft")
+                                            .foregroundColor(Color(hex: "212529"))
                                     }
                                 }
                                 .pickerStyle(WheelPickerStyle())
@@ -183,11 +184,12 @@ struct OnboardingView: View {
                             VStack {
                                 Text("Inches")
                                     .font(.subheadline)
-                                    .foregroundColor(.black.opacity(0.7))
+                                    .foregroundColor(Color(hex: "6C757D"))
                                 
                                 Picker("Inches", selection: $selectedHeightInches) {
                                     ForEach(inchesRange, id: \.self) { inches in
                                         Text("\(inches) in")
+                                            .foregroundColor(Color(hex: "212529"))
                                     }
                                 }
                                 .pickerStyle(WheelPickerStyle())
@@ -199,11 +201,12 @@ struct OnboardingView: View {
                     VStack(alignment: .leading) {
                         Text("Weight (lbs)")
                             .font(.headline)
-                            .foregroundColor(.black)
+                            .foregroundColor(Color(hex: "212529"))
                         
                         Picker("Weight", selection: $selectedWeight) {
                             ForEach(weightRange, id: \.self) { weight in
                                 Text("\(weight) lbs")
+                                    .foregroundColor(Color(hex: "212529"))
                             }
                         }
                         .pickerStyle(WheelPickerStyle())
@@ -213,7 +216,7 @@ struct OnboardingView: View {
                     VStack(alignment: .leading) {
                         Text("Gender")
                             .font(.headline)
-                            .foregroundColor(.black)
+                            .foregroundColor(Color(hex: "212529"))
                         
                         HStack(spacing: 15) {
                             ForEach(Gender.allCases, id: \.self) { gender in
@@ -221,10 +224,10 @@ struct OnboardingView: View {
                                     selectedGender = gender
                                 }) {
                                     Text(gender.rawValue)
-                                        .foregroundColor(selectedGender == gender ? .white : .black)
+                                        .foregroundColor(selectedGender == gender ? .white : Color(hex: "495057"))
                                         .padding()
                                         .frame(maxWidth: .infinity)
-                                        .background(selectedGender == gender ? Color.black : Color.white.opacity(0.8))
+                                        .background(selectedGender == gender ? Color(hex: "343A40") : Color(hex: "E9ECEF"))
                                         .cornerRadius(10)
                                 }
                             }
@@ -244,7 +247,7 @@ struct OnboardingView: View {
                 Text("What are your fitness goals?")
                     .font(.title2)
                     .fontWeight(.bold)
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(hex: "212529"))
                 
                 ScrollView {
                     LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 15) {
@@ -257,10 +260,10 @@ struct OnboardingView: View {
                                 }
                             }) {
                                 Text(goal.rawValue)
-                                    .foregroundColor(selectedGoals.contains(goal) ? .white : .black)
+                                    .foregroundColor(selectedGoals.contains(goal) ? .white : Color(hex: "495057"))
                                     .padding()
                                     .frame(maxWidth: .infinity)
-                                    .background(selectedGoals.contains(goal) ? Color.black : Color.white.opacity(0.8))
+                                    .background(selectedGoals.contains(goal) ? Color(hex: "343A40") : Color(hex: "E9ECEF"))
                                     .cornerRadius(10)
                             }
                         }
@@ -279,7 +282,7 @@ struct OnboardingView: View {
                 Text("Any dietary preferences?")
                     .font(.title2)
                     .fontWeight(.bold)
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(hex: "212529"))
                 
                 ScrollView {
                     LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 15) {
@@ -292,10 +295,10 @@ struct OnboardingView: View {
                                 }
                             }) {
                                 Text(preference.rawValue)
-                                    .foregroundColor(selectedPreferences.contains(preference) ? .white : .black)
+                                    .foregroundColor(selectedPreferences.contains(preference) ? .white : Color(hex: "495057"))
                                     .padding()
                                     .frame(maxWidth: .infinity)
-                                    .background(selectedPreferences.contains(preference) ? Color.black : Color.white.opacity(0.8))
+                                    .background(selectedPreferences.contains(preference) ? Color(hex: "343A40") : Color(hex: "E9ECEF"))
                                     .cornerRadius(10)
                             }
                         }
@@ -313,24 +316,24 @@ struct OnboardingView: View {
             VStack(spacing: 20) {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.system(size: 60))
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(hex: "40C057"))
                 
                 Text("You're all set!")
                     .font(.title)
                     .fontWeight(.bold)
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(hex: "212529"))
                 
                 Text("Let's start tracking your supplements")
                     .font(.title3)
                     .multilineTextAlignment(.center)
-                    .foregroundColor(.black.opacity(0.7))
+                    .foregroundColor(Color(hex: "6C757D"))
                 
                 Button(action: {
                     viewModel.completeOnboarding(
                         name: name,
                         age: selectedAge,
                         height: Double(selectedHeightFeet) * 0.3048 + Double(selectedHeightInches) * 0.0254,
-                        weight: Double(selectedWeight),
+                        weight: Double(selectedWeight) * 0.453592, // Convert pounds to kg
                         gender: selectedGender,
                         goals: Array(selectedGoals),
                         preferences: Array(selectedPreferences)
@@ -340,7 +343,7 @@ struct OnboardingView: View {
                         .foregroundColor(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(Color.black)
+                        .background(Color(hex: "40C057"))
                         .cornerRadius(10)
                 }
                 .padding(.top)
