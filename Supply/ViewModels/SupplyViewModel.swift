@@ -14,6 +14,9 @@ class SupplyViewModel: ObservableObject {
     @Published var userGender: Gender? = nil
     @Published var userGoals: Set<FitnessGoal> = []
     
+    private let keychainManager = KeychainManager.shared
+    private let userDataKey = "userData"
+    
     init() {
         // Initialize with default user
         self.currentUser = User(
@@ -26,7 +29,7 @@ class SupplyViewModel: ObservableObject {
             dietaryPreferences: [],
             supplements: []
         )
-        loadFromUserDefaults()
+        loadUserData()
         loadRecommendedSupplements()
     }
     
@@ -38,7 +41,7 @@ class SupplyViewModel: ObservableObject {
         currentUser.gender = gender
         currentUser.fitnessGoals = goals
         currentUser.dietaryPreferences = preferences
-        saveToUserDefaults()
+        saveUserData()
     }
     
     func updateUserProfile(name: String, age: Int, height: Double?, weight: Double?, gender: Gender?, goals: [FitnessGoal], preferences: [DietaryPreference]) {
@@ -49,24 +52,24 @@ class SupplyViewModel: ObservableObject {
         currentUser.gender = gender
         currentUser.fitnessGoals = goals
         currentUser.dietaryPreferences = preferences
-        saveToUserDefaults()
+        saveUserData()
     }
     
     func toggleSupplementTaken(_ supplement: Supplement) {
         if let index = currentUser.supplements.firstIndex(where: { $0.id == supplement.id }) {
             currentUser.supplements[index].isTaken.toggle()
-            saveToUserDefaults()
+            saveUserData()
         }
     }
     
     func addSupplement(_ supplement: Supplement) {
         currentUser.supplements.append(supplement)
-        saveToUserDefaults()
+        saveUserData()
     }
     
     func removeSupplement(_ supplement: Supplement) {
         currentUser.supplements.removeAll { $0.id == supplement.id }
-        saveToUserDefaults()
+        saveUserData()
     }
     
     private func loadRecommendedSupplements() {
@@ -95,16 +98,33 @@ class SupplyViewModel: ObservableObject {
         }
     }
     
-    private func saveToUserDefaults() {
-        if let encoded = try? JSONEncoder().encode(currentUser) {
-            UserDefaults.standard.set(encoded, forKey: "userData")
+    private func saveUserData() {
+        do {
+            let encoder = JSONEncoder()
+            let userData = try encoder.encode(currentUser)
+            try keychainManager.saveSecureData(userData, forKey: userDataKey)
+        } catch KeychainError.duplicateEntry {
+            do {
+                let encoder = JSONEncoder()
+                let userData = try encoder.encode(currentUser)
+                try keychainManager.updateSecureData(userData, forKey: userDataKey)
+            } catch {
+                errorMessage = "Failed to update user data: \(error.localizedDescription)"
+            }
+        } catch {
+            errorMessage = "Failed to save user data: \(error.localizedDescription)"
         }
     }
     
-    private func loadFromUserDefaults() {
-        if let userData = UserDefaults.standard.data(forKey: "userData"),
-           let decodedUser = try? JSONDecoder().decode(User.self, from: userData) {
-            self.currentUser = decodedUser
+    private func loadUserData() {
+        do {
+            let userData = try keychainManager.loadSecureData(forKey: userDataKey)
+            let decoder = JSONDecoder()
+            currentUser = try decoder.decode(User.self, from: userData)
+        } catch KeychainError.unknown(errSecItemNotFound) {
+            // No data saved yet, use default user
+        } catch {
+            errorMessage = "Failed to load user data: \(error.localizedDescription)"
         }
     }
 } 
