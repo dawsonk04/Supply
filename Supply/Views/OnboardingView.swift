@@ -25,7 +25,7 @@ struct OnboardingView: View {
             VStack(spacing: 30) {
                 // Progress bar
                 ProgressView(value: Double(currentStep), total: 5)
-                    .tint(Color(hex: "343A40"))
+                    .tint(Color(hex: "4A90E2"))
                     .frame(height: 6)
                     .background(Color(hex: "DEE2E6"))
                     .cornerRadius(3)
@@ -83,7 +83,7 @@ struct OnboardingView: View {
                                 .foregroundColor(.white)
                                 .padding()
                                 .frame(maxWidth: .infinity)
-                                .background(Color(hex: "343A40"))
+                                .background(Color(hex: "4A90E2"))
                                 .cornerRadius(10)
                         }
                     }
@@ -227,7 +227,7 @@ struct OnboardingView: View {
                                         .foregroundColor(selectedGender == gender ? .white : Color(hex: "495057"))
                                         .padding()
                                         .frame(maxWidth: .infinity)
-                                        .background(selectedGender == gender ? Color(hex: "343A40") : Color(hex: "E9ECEF"))
+                                        .background(selectedGender == gender ? Color(hex: "4A90E2") : Color(hex: "E9ECEF"))
                                         .cornerRadius(10)
                                 }
                             }
@@ -263,7 +263,7 @@ struct OnboardingView: View {
                                     .foregroundColor(selectedGoals.contains(goal) ? .white : Color(hex: "495057"))
                                     .padding()
                                     .frame(maxWidth: .infinity)
-                                    .background(selectedGoals.contains(goal) ? Color(hex: "343A40") : Color(hex: "E9ECEF"))
+                                    .background(selectedGoals.contains(goal) ? Color(hex: "4A90E2") : Color(hex: "E9ECEF"))
                                     .cornerRadius(10)
                             }
                         }
@@ -298,7 +298,7 @@ struct OnboardingView: View {
                                     .foregroundColor(selectedPreferences.contains(preference) ? .white : Color(hex: "495057"))
                                     .padding()
                                     .frame(maxWidth: .infinity)
-                                    .background(selectedPreferences.contains(preference) ? Color(hex: "343A40") : Color(hex: "E9ECEF"))
+                                    .background(selectedPreferences.contains(preference) ? Color(hex: "4A90E2") : Color(hex: "E9ECEF"))
                                     .cornerRadius(10)
                             }
                         }
@@ -316,7 +316,7 @@ struct OnboardingView: View {
             VStack(spacing: 20) {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.system(size: 60))
-                    .foregroundColor(Color(hex: "40C057"))
+                    .foregroundColor(Color(hex: "4A90E2"))
                 
                 Text("You're all set!")
                     .font(.title)
@@ -343,7 +343,7 @@ struct OnboardingView: View {
                         .foregroundColor(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(Color(hex: "40C057"))
+                        .background(Color(hex: "4A90E2"))
                         .cornerRadius(10)
                 }
                 .padding(.top)
