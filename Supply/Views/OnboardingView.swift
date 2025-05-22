@@ -20,16 +20,18 @@ struct OnboardingView: View {
     
     var body: some View {
         ZStack {
-            Color(hex: "F8F9FA").ignoresSafeArea()
+            Color.white.ignoresSafeArea()
             
             VStack(spacing: 30) {
-                // Progress bar
-                ProgressView(value: Double(currentStep), total: 5)
-                    .tint(Color(hex: "4A90E2"))
-                    .frame(height: 6)
-                    .background(Color(hex: "DEE2E6"))
-                    .cornerRadius(3)
-                    .padding(.horizontal)
+                if currentStep > 0 {
+                    // Progress bar - only show after first screen
+                    ProgressView(value: Double(currentStep - 1), total: 4)
+                        .tint(Color(hex: "4A90E2"))
+                        .frame(height: 6)
+                        .background(Color(hex: "DEE2E6"))
+                        .cornerRadius(3)
+                        .padding(.horizontal)
+                }
                 
                 // Content
                 TabView(selection: $currentStep) {
@@ -53,27 +55,27 @@ struct OnboardingView: View {
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
                 
-                // Navigation buttons
-                HStack(spacing: 20) {
-                    if currentStep > 0 {
-                        Button(action: {
-                            withAnimation {
-                                currentStep -= 1
+                // Navigation buttons - only show after first screen
+                if currentStep > 0 {
+                    HStack(spacing: 20) {
+                        if currentStep > 1 {
+                            Button(action: {
+                                withAnimation {
+                                    currentStep -= 1
+                                }
+                            }) {
+                                HStack {
+                                    Image(systemName: "chevron.left")
+                                    Text("Back")
+                                }
+                                .foregroundColor(Color(hex: "495057"))
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color(hex: "E9ECEF"))
+                                .cornerRadius(10)
                             }
-                        }) {
-                            HStack {
-                                Image(systemName: "chevron.left")
-                                Text("Back")
-                            }
-                            .foregroundColor(Color(hex: "495057"))
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color(hex: "E9ECEF"))
-                            .cornerRadius(10)
                         }
-                    }
-                    
-                    if currentStep < 5 {
+                        
                         Button(action: {
                             withAnimation {
                                 currentStep += 1
@@ -87,32 +89,81 @@ struct OnboardingView: View {
                                 .cornerRadius(10)
                         }
                     }
+                    .padding(.horizontal)
                 }
-                .padding(.horizontal)
             }
         }
         .navigationBarBackButtonHidden(true)
     }
     
     private var welcomeView: some View {
-        GlassCard {
-            VStack(spacing: 20) {
-                Image(systemName: "pills.fill")
-                    .font(.system(size: 60))
-                    .foregroundColor(Color(hex: "343A40"))
-                
-                Text("Welcome to Supply")
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .foregroundColor(Color(hex: "212529"))
-                
-                Text("Your personal supplement tracking companion")
-                    .font(.title3)
-                    .multilineTextAlignment(.center)
-                    .foregroundColor(Color(hex: "6C757D"))
+        VStack(spacing: 0) {
+            // Logo in top-left corner
+            HStack {
+                Image("SupplyLogo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 40, height: 40)
+                Spacer()
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .padding()
+            .padding(.horizontal, 24)
+            .padding(.top, 60)
+            
+            // Main content
+            VStack(spacing: 40) {
+                VStack(spacing: 24) {
+                    Image("SupplyLogo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 80, height: 80)
+                    
+                    VStack(spacing: 8) {
+                        Text("Welcome To")
+                            .font(.system(size: 32, weight: .regular))
+                        Text("Supply")
+                            .font(.system(size: 32, weight: .regular))
+                    }
+                }
+                .padding(.top, 40)
+                
+                VStack(spacing: 8) {
+                    Text("Feel Better. Perform Better.")
+                        .font(.system(size: 20))
+                        .foregroundColor(Color(hex: "4A90E2"))
+                    Text("Live Better")
+                        .font(.system(size: 20))
+                        .foregroundColor(Color(hex: "4A90E2"))
+                }
+                
+                Spacer()
+                
+                VStack(spacing: 16) {
+                    Text("Just Answer a Few Quick Questions to Get Started")
+                        .font(.system(size: 16))
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.black.opacity(0.8))
+                    
+                    Button(action: {
+                        withAnimation {
+                            currentStep += 1
+                        }
+                    }) {
+                        Text("Get Started")
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .background(Color(hex: "4A90E2"))
+                            .cornerRadius(28)
+                    }
+                    .padding(.horizontal, 24)
+                    
+                    Text("On Average Takes Less Than 60 Seconds To Complete")
+                        .font(.system(size: 12))
+                        .foregroundColor(.black.opacity(0.6))
+                }
+                .padding(.bottom, 40)
+            }
         }
     }
     
