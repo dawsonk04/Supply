@@ -9,7 +9,6 @@ struct User: Codable, Identifiable {
     var gender: Gender?
     var fitnessGoals: [FitnessGoal]
     var dietaryPreferences: [DietaryPreference]
-    var supplements: [Supplement]
     
     // Helper computed properties
     var heightInFeet: Int? {
