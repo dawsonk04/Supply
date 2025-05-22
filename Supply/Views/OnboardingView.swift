@@ -11,6 +11,7 @@ struct OnboardingView: View {
     @State private var selectedGender: Gender? = nil
     @State private var selectedGoals: Set<FitnessGoal> = []
     @State private var selectedPreferences: Set<DietaryPreference> = []
+    @Binding var navigationPath: NavigationPath
     
     // Arrays for picker data
     private let ageRange = Array(13...75)
@@ -23,9 +24,9 @@ struct OnboardingView: View {
             Color.white.ignoresSafeArea()
             
             VStack(spacing: 30) {
-                if currentStep > 0 {
-                    // Progress bar - only show after first screen
-                    ProgressView(value: Double(currentStep - 1), total: 4)
+                if currentStep > 0 && currentStep < 5 {
+                    // Progress bar - only show for steps 1-4
+                    ProgressView(value: Double(min(currentStep - 1, 4)), total: 4)
                         .tint(Color(hex: "4A90E2"))
                         .frame(height: 6)
                         .background(Color(hex: "DEE2E6"))
@@ -55,8 +56,8 @@ struct OnboardingView: View {
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
                 
-                // Navigation buttons - only show after first screen
-                if currentStep > 0 {
+                // Navigation buttons - only show for steps 1-4
+                if currentStep > 0 && currentStep < 5 {
                     HStack(spacing: 20) {
                         if currentStep > 1 {
                             Button(action: {
@@ -81,7 +82,7 @@ struct OnboardingView: View {
                                 currentStep += 1
                             }
                         }) {
-                            Text(currentStep == 4 ? "Get Started" : "Next")
+                            Text(currentStep == 4 ? "Complete" : "Next")
                                 .foregroundColor(.white)
                                 .padding()
                                 .frame(maxWidth: .infinity)
@@ -377,24 +378,20 @@ struct OnboardingView: View {
                     .foregroundColor(Color(hex: "6C757D"))
                 
                 Button(action: {
-                    viewModel.completeOnboarding(
-                        name: name,
-                        age: selectedAge,
-                        height: Double(selectedHeightFeet) * 0.3048 + Double(selectedHeightInches) * 0.0254,
-                        weight: Double(selectedWeight) * 0.453592, // Convert pounds to kg
-                        gender: selectedGender,
-                        goals: Array(selectedGoals),
-                        preferences: Array(selectedPreferences)
-                    )
+                    navigationPath.append(NavigationDestination.signup)
                 }) {
                     Text("Get Started")
+                        .font(.system(size: 17, weight: .semibold))
                         .foregroundColor(.white)
-                        .padding()
                         .frame(maxWidth: .infinity)
+                        .frame(height: 56)
                         .background(Color(hex: "4A90E2"))
-                        .cornerRadius(10)
+                        .cornerRadius(28)
                 }
+                .buttonStyle(PlainButtonStyle())
+                .padding(.horizontal, 24)
                 .padding(.top)
+                .contentShape(Rectangle())
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding()
@@ -403,6 +400,6 @@ struct OnboardingView: View {
 }
 
 #Preview {
-    OnboardingView()
+    OnboardingView(navigationPath: .constant(NavigationPath()))
         .environmentObject(SupplyViewModel())
 } 
