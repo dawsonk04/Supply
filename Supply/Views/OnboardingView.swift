@@ -98,40 +98,37 @@ struct OnboardingView: View {
     
     private var welcomeView: some View {
         VStack(spacing: 0) {
-            // Logo in top-left corner
+            // logo top left corner 
             HStack {
-                Image("SupplyLogo")
+                Image("supply-logo")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 40, height: 40)
+                    .frame(width: 64, height: 64) 
                 Spacer()
             }
             .padding(.horizontal, 24)
-            .padding(.top, 60)
+            .padding(.top, 48)
             
             // Main content
             VStack(spacing: 40) {
-                VStack(spacing: 24) {
-                    Image("SupplyLogo")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 80, height: 80)
-                    
-                    VStack(spacing: 8) {
+                VStack(alignment: .leading, spacing: 24) {
+                    VStack(alignment: .leading, spacing: 8) {
                         Text("Welcome To")
-                            .font(.system(size: 32, weight: .regular))
+                            .font(.system(size: 32, weight: .bold))
                         Text("Supply")
-                            .font(.system(size: 32, weight: .regular))
+                            .font(.system(size: 32, weight: .bold))
                     }
                 }
                 .padding(.top, 40)
+                .padding(.horizontal, 24)
+                .frame(maxWidth: .infinity, alignment: .leading)
                 
                 VStack(spacing: 8) {
                     Text("Feel Better. Perform Better.")
-                        .font(.system(size: 20))
+                        .font(.system(size: 20, weight: .bold))
                         .foregroundColor(Color(hex: "4A90E2"))
                     Text("Live Better")
-                        .font(.system(size: 20))
+                        .font(.system(size: 20, weight: .bold))
                         .foregroundColor(Color(hex: "4A90E2"))
                 }
                 
@@ -139,9 +136,9 @@ struct OnboardingView: View {
                 
                 VStack(spacing: 16) {
                     Text("Just Answer a Few Quick Questions to Get Started")
-                        .font(.system(size: 16))
+                        .font(.system(size: 12))
                         .multilineTextAlignment(.center)
-                        .foregroundColor(.black.opacity(0.8))
+                        .foregroundColor(.black.opacity(0.5))
                     
                     Button(action: {
                         withAnimation {
@@ -159,7 +156,7 @@ struct OnboardingView: View {
                     .padding(.horizontal, 24)
                     
                     Text("On Average Takes Less Than 60 Seconds To Complete")
-                        .font(.system(size: 12))
+                        .font(.system(size: 10))
                         .foregroundColor(.black.opacity(0.6))
                 }
                 .padding(.bottom, 40)
